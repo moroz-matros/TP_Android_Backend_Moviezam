@@ -1,8 +1,11 @@
 package models
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
-type Song struct {
+type SongJSON struct {
 	Id             int    `json:"id"`
 	Name           string `json:"name"`
 	NameStub       string `json:"name_stub"`
@@ -13,6 +16,19 @@ type Song struct {
 	Itunes         string `json:"itunes"`
 	Spotify        string `json:"spotify"`
 	Youtube        string `json:"youtube"`
+}
+
+type SongSQL struct {
+	Id             int            `json:"id"`
+	Name           string         `json:"name"`
+	NameStub       string         `json:"name_stub"`
+	AlbumName      string         `json:"album_name"`
+	ExternalArtUrl sql.NullString `json:"external_art_url"`
+	Amazon         sql.NullString `json:"amazon"`
+	AppleMusic     sql.NullString `json:"apple_music"`
+	Itunes         sql.NullString `json:"itunes"`
+	Spotify        sql.NullString `json:"spotify"`
+	Youtube        sql.NullString `json:"youtube"`
 }
 
 type Artist struct {
@@ -28,17 +44,26 @@ type Artist struct {
 	UrlApplemusic string `json:"url_applemusic"`
 	UrlItunes     string `json:"url_itunes"`
 	UrlAmazon     string `json:"url_amazon"`
+	Songs []SongCard `json:"songs"`
+}
+
+type SongCard struct {
+	Id     int    `json:"id"`
+	Name   string `json:"name"`
+	Artist string `json:"artist"`
+	Album  string `json:"album"`
+	Image  string `json:"image"`
 }
 
 type FilmSQL struct {
-	Id           int    `json:"id"`
-	Name         string `json:"name"`
-	NameStub     string `json:"name_stub"`
-	AirDateStart int64   `json:"air_date_start"`
-	AirDateEnd   int64 `json:"air_date_end"`
-	Image        string `json:"image"`
+	Id           int       `json:"id"`
+	Name         string    `json:"name"`
+	NameStub     string    `json:"name_stub"`
+	AirDateStart int64     `json:"air_date_start"`
+	AirDateEnd   int64     `json:"air_date_end"`
+	Image        string    `json:"image"`
 	ReleaseDate  time.Time `json:"release_date"`
-	TypeFilm     string `json:"type_film"`
+	TypeFilm     string    `json:"type_film"`
 }
 
 type FilmJSON struct {
@@ -49,4 +74,33 @@ type FilmJSON struct {
 	AirDateEnd   string `json:"air_date_end"`
 	Image        string `json:"image"`
 	ReleaseDate  string `json:"release_date"`
+}
+
+type FilmCard struct {
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
+	ReleaseDate string `json:"release_date"`
+	Image       string `json:"image"`
+}
+
+type ArtistCard struct {
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
+	Image       string `json:"image"`
+}
+
+type SongShazam struct {
+	Id             int        `json:"id"`
+	Name           string     `json:"name"`
+	NameStub       string     `json:"name_stub"`
+	Artist         string     `json:"artist"`
+	Image          string     `json:"image"`
+	AlbumName      string     `json:"album_name"`
+	ExternalArtUrl string     `json:"external_art_url"`
+	Amazon         string     `json:"amazon"`
+	AppleMusic     string     `json:"apple_music"`
+	Itunes         string     `json:"itunes"`
+	Spotify        string     `json:"spotify"`
+	Youtube        string     `json:"youtube"`
+	Films          []FilmCard `json:"films"`
 }

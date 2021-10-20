@@ -13,21 +13,32 @@ func CreateUsecase(repo *repository.Repo) *Usecase {
 	return &Usecase{Repo: repo}
 }
 
-func (uc *Usecase) SearchSong(name string) ([]models.Song, error) {
-	return uc.Repo.SearchSong(name)
+func (uc *Usecase) SearchSong(name string) ([]models.SongJSON, error) {
+	songs, err := uc.Repo.SearchSong(name)
+	if err != nil {
+		return []models.SongJSON{}, err
+	}
+
+	var songsJSON []models.SongJSON
+	for _, elem := range songs{
+		songsJSON = append(songsJSON, models.ConvertSong(elem))
+	}
+	return songsJSON, nil
 }
 
 func (uc *Usecase) SearchArtist(name string) ([]models.Artist, error) {
 	return  uc.Repo.SearchArtist(name)
 }
 
-func (uc *Usecase) GetSongsByArtistId(id int) ([]models.Song, error){
+func (uc *Usecase) GetSongsByArtistId(id int) ([]models.SongSQL, error){
 	return uc.Repo.GetSongsByArtistId(id)
 }
 
-func (uc *Usecase) GetSongsByFilmId(id int) ([]models.Song, error){
-	return uc.Repo.GetSongsByFilmId(id)
+/*
+func (uc *Usecase) GetSongsByFilmId(id int) ([]models.SongJSON, error){
+	//return uc.Repo.GetSongsByFilmId(id)
 }
+ */
 
 func (uc *Usecase) SearchFilm(name string) ([]models.FilmJSON, error) {
 	filmsSQL, err := uc.Repo.SearchFilm(name)

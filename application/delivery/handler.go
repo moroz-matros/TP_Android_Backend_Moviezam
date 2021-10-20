@@ -3,7 +3,6 @@ package delivery
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/moroz-matros/TP_Android_Backend_Moviezam/application/models"
 	"github.com/moroz-matros/TP_Android_Backend_Moviezam/application/usecase"
 	"log"
 	"net/http"
@@ -33,6 +32,8 @@ func CreateHandler(m *mux.Router, uc *usecase.Usecase) *Handler {
 	// /artist?song_id=1
 	m.HandleFunc("/songs", handler.GetSongs)
 	// /songs?artist_id=1&film_id=1
+
+	m.HandleFunc("/moviezam", handler.Shazam)
 
 	return handler
 }
@@ -86,12 +87,13 @@ func (h *Handler) GetSongs(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	filmId, err := strconv.Atoi(r.URL.Query().Get("film_id"))
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	//filmId, err := strconv.Atoi(r.URL.Query().Get("film_id"))
+	//if err != nil {
+	//	w.WriteHeader(http.StatusBadRequest)
+	//	return
+	//}
 
+	/*
 	if filmId != 0 {
 		songs, err := h.Uc.GetSongsByFilmId(artistId)
 		if err != nil {
@@ -103,6 +105,8 @@ func (h *Handler) GetSongs(w http.ResponseWriter, r *http.Request){
 		w.Write(body)
 		return
 	}
+
+	 */
 }
 
 func (h *Handler) SearchFilm(w http.ResponseWriter, r *http.Request){
@@ -123,7 +127,6 @@ func (h *Handler) SearchFilm(w http.ResponseWriter, r *http.Request){
 
 func (h *Handler) SearchSong(w http.ResponseWriter, r *http.Request){
 	searchString := r.URL.Query().Get("search")
-
 	songs, err := h.Uc.SearchSong(searchString)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -152,24 +155,13 @@ func (h *Handler) SearchArtist(w http.ResponseWriter, r *http.Request){
 	w.Write(body)
 }
 
-func (h *Handler) GetSongByName(w http.ResponseWriter, r *http.Request){
-	searchString := r.URL.Query().Get("name")
-
-	song := models.Song{Id: 11, Name: searchString}
-
-	body, err := json.Marshal(song)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(body)
-}
 
 func (h *Handler) GetSongsByFilm(w http.ResponseWriter, r *http.Request){
 	_ = r.URL.Query().Get("film_id")
+
+}
+
+func (h *Handler) Shazam(w http.ResponseWriter, r *http.Request) {
 
 }
 

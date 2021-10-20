@@ -24,19 +24,19 @@ func (r *Repo) GetSongByName(name string){
 
 }
 
-func (r *Repo) GetSongsByFilmId(id int) ([]models.Song, error){
-	var songs []models.Song
+func (r *Repo) GetSongsByFilmId(id int) ([]models.SongSQL, error){
+	var songs []models.SongSQL
 	err := pgxscan.Select(context.Background(), r.Pool, &songs,
 		"SELECT * from sounds " +
 		"JOIN film_sound ON id_film = $1", id)
 
 	if errors.As(err, &sql.ErrNoRows) {
-		return []models.Song{}, nil
+		return []models.SongSQL{}, nil
 	}
 
 	if err != nil {
 		log.Println(err)
-		return []models.Song{}, err
+		return []models.SongSQL{}, err
 	}
 
 	return songs, nil
@@ -63,18 +63,18 @@ func (r *Repo) GetArtistBySongId(id uint) (models.Artist, error){
 	return artist, nil
 }
 
-func (r *Repo) GetSongsByArtistId(id int) ([]models.Song, error){
-	var songs []models.Song
+func (r *Repo) GetSongsByArtistId(id int) ([]models.SongSQL, error){
+	var songs []models.SongSQL
 	err := pgxscan.Select(context.Background(), r.Pool, &songs,
 		"SELECT * FROM songs JOIN sound_artist ON artist_id = $1", id)
 
 	if errors.As(err, &sql.ErrNoRows) {
-		return []models.Song{}, nil
+		return []models.SongSQL{}, nil
 	}
 
 	if err != nil {
 		log.Println(err)
-		return []models.Song{}, err
+		return []models.SongSQL{}, err
 	}
 
 	return songs, nil
@@ -114,18 +114,17 @@ func (r *Repo) SearchFilm(name string) ([]models.FilmSQL, error) {
 	return films, nil
 }
 
-func (r *Repo) SearchSong(name string) ([]models.Song, error) {
-	var songs []models.Song
+func (r *Repo) SearchSong(name string) ([]models.SongSQL, error) {
+	var songs []models.SongSQL
 	err := pgxscan.Select(context.Background(), r.Pool, &songs,
-		"SELECT * FROM songs WHERE LOWER(name) LIKE '%' || $1 || '%'", strings.ToLower(name))
-
+		"SELECT * FROM sounds WHERE LOWER(name) LIKE '%' || $1 || '%'", strings.ToLower(name))
 	if errors.As(err, &sql.ErrNoRows) {
-		return []models.Song{}, nil
+		return []models.SongSQL{}, nil
 	}
 
 	if err != nil {
 		log.Println(err)
-		return []models.Song{}, err
+		return []models.SongSQL{}, err
 	}
 
 	return songs, nil
