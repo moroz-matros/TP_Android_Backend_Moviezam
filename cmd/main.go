@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/pgxpool"
 	"github.com/moroz-matros/TP_Android_Backend_Moviezam/application/delivery"
 	"github.com/moroz-matros/TP_Android_Backend_Moviezam/application/repository"
 	"github.com/moroz-matros/TP_Android_Backend_Moviezam/application/usecase"
@@ -17,7 +19,7 @@ func main() {
 		Addr: 		"localhost"+config.Port,
 	}
 
-	/*
+
 	pool, err := pgxpool.Connect(context.Background(), config.DBConnect)
 	if err != nil {
 		log.Fatal(err)
@@ -29,12 +31,12 @@ func main() {
 	}
 
 
-	 */
-	repo := repository.CreateRepo(/*pool*/)
+
+	repo := repository.CreateRepo(pool)
 	uc := usecase.CreateUsecase(repo)
 	_ = delivery.CreateHandler(m, uc)
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}

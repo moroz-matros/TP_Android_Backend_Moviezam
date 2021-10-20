@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Song struct {
 	Id             int    `json:"id"`
 	Name           string `json:"name"`
@@ -35,7 +37,7 @@ type FilmSQL struct {
 	AirDateStart int64   `json:"air_date_start"`
 	AirDateEnd   int64 `json:"air_date_end"`
 	Image        string `json:"image"`
-	ReleaseDate  int64 `json:"release_date"`
+	ReleaseDate  time.Time `json:"release_date"`
 	TypeFilm     string `json:"type_film"`
 }
 

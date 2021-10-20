@@ -20,6 +20,9 @@ func CreateHandler(m *mux.Router, uc *usecase.Usecase) *Handler {
 	m.HandleFunc("/find_film", handler.SearchFilm)
 	// /find_film?search=Harry+Potter
 
+	m.HandleFunc("/similar_films", handler.GetSimilarFilms)
+	// /similar_films?film_id=1
+
 	m.HandleFunc("/find_song", handler.SearchSong)
 	// /songs?search=just+tonight
 
@@ -39,12 +42,27 @@ func (h *Handler) GetFilmsBySongId(w http.ResponseWriter, r *http.Request){
 
 }
 
-func (h *Handler) GetSimilarFilmsBySongName(w http.ResponseWriter, r *http.Request){
+func (h *Handler) GetSimilarFilms(w http.ResponseWriter, r *http.Request){
+	filmId := r.URL.Query().Get("film_id")
+	id, err := strconv.Atoi(filmId)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	films, err := h.Uc.GetSimilarFilms(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
+	body, _ := json.Marshal(films)
+	w.WriteHeader(http.StatusOK)
+	w.Write(body)
 }
 
 func (h *Handler) GetArtistBySongId(w http.ResponseWriter, r *http.Request){
-	songId := r.URL.Query().Get("song_id")
+	_ = r.URL.Query().Get("song_id")
 
 }
 
@@ -92,6 +110,7 @@ func (h *Handler) SearchFilm(w http.ResponseWriter, r *http.Request){
 
 	films, err := h.Uc.SearchFilm(searchString)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -150,7 +169,7 @@ func (h *Handler) GetSongByName(w http.ResponseWriter, r *http.Request){
 }
 
 func (h *Handler) GetSongsByFilm(w http.ResponseWriter, r *http.Request){
-	filmId := r.URL.Query().Get("film_id")
+	_ = r.URL.Query().Get("film_id")
 
 }
 

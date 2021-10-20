@@ -10,7 +10,7 @@ func ConvertFilm(film FilmSQL) FilmJSON {
 		AirDateStart: time.Unix(film.AirDateStart, 0).String(),
 		AirDateEnd:   time.Unix(film.AirDateEnd, 0).String(),
 		Image:        film.Image,
-		ReleaseDate:  time.Unix(film.ReleaseDate, 0).String(),
+		ReleaseDate:  film.ReleaseDate.String(),
 	}
 
 }

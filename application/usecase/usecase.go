@@ -41,3 +41,16 @@ func (uc *Usecase) SearchFilm(name string) ([]models.FilmJSON, error) {
 	}
 	return filmsJSON, nil
 }
+
+func (uc *Usecase) GetSimilarFilms(id int) ([]models.FilmJSON, error) {
+	filmsSQL, err := uc.Repo.GetSimilarFilms(id)
+	if err != nil {
+		return []models.FilmJSON{}, err
+	}
+
+	var filmsJSON []models.FilmJSON
+	for _, elem := range filmsSQL {
+		filmsJSON = append(filmsJSON, models.ConvertFilm(elem))
+	}
+	return filmsJSON, nil
+}

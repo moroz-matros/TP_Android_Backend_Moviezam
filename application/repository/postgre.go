@@ -130,3 +130,21 @@ func (r *Repo) SearchSong(name string) ([]models.Song, error) {
 
 	return songs, nil
 }
+
+func (r *Repo) GetSimilarFilms(id int) ([]models.FilmSQL, error) {
+	var films []models.FilmSQL
+	err := pgxscan.Select(context.Background(), r.Pool, &films,
+		"SELECT * FROM films WHERE id IN" +
+		"(SELECT DISTINCT (film_id) FROM similars WHERE similar_film_id = $1)", id)
+
+	if errors.As(err, &sql.ErrNoRows) {
+		return []models.FilmSQL{}, nil
+	}
+
+	if err != nil {
+		log.Println(err)
+		return []models.FilmSQL{}, err
+	}
+
+	return films, nil
+}
