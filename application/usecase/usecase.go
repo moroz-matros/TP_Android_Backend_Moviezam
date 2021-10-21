@@ -13,26 +13,77 @@ func CreateUsecase(repo *repository.Repo) *Usecase {
 	return &Usecase{Repo: repo}
 }
 
-func (uc *Usecase) SearchSong(name string) ([]models.SongJSON, error) {
-	songs, err := uc.Repo.SearchSong(name)
+func (uc *Usecase) SearchSong(name string, page int) ([]models.SongCard, error) {
+	songs, err := uc.Repo.SearchSong(name, page)
 	if err != nil {
-		return []models.SongJSON{}, err
+		return []models.SongCard{}, err
 	}
 
-	var songsJSON []models.SongJSON
+	var songCards []models.SongCard
 	for _, elem := range songs{
-		songsJSON = append(songsJSON, models.ConvertSong(elem))
+		artistName, err := uc.Repo.GetArtistNameBySongId(elem.Id)
+		if err != nil {
+			return []models.SongCard{}, err
+		}
+		albumName, err := uc.Repo.GetAlbumNameBySongId(elem.Id)
+		if err != nil {
+			return []models.SongCard{}, err
+		}
+		songCards = append(songCards, models.ConvertSongToCard(elem, artistName,
+			albumName))
 	}
-	return songsJSON, nil
+
+	return songCards, nil
 }
 
-func (uc *Usecase) SearchArtist(name string) ([]models.Artist, error) {
-	return  uc.Repo.SearchArtist(name)
+func (uc *Usecase) SearchArtist(name string, page int) ([]models.ArtistCard, error) {
+	artistsSQL, err := uc.Repo.SearchArtist(name, page)
+	if err != nil {
+		return []models.ArtistCard{}, err
+	}
+
+	var artistCards []models.ArtistCard
+	for _, elem := range artistsSQL {
+		artistCards = append(artistCards, models.ConvertArtistToCard(elem))
+	}
+
+	return artistCards, nil
 }
 
 func (uc *Usecase) GetSongsByArtistId(id int) ([]models.SongSQL, error){
 	return uc.Repo.GetSongsByArtistId(id)
 }
+
+func (uc *Usecase) GetArtistById(id int) (models.Artist, error){
+	artist, err := uc.Repo.GetArtistById(id)
+	if err != nil {
+		return models.Artist{}, err
+	}
+
+	a := models.ConvertArtist(artist)
+	songs, err := uc.Repo.GetSongsByArtistId(id)
+	if err != nil {
+		return models.Artist{}, err
+	}
+
+	var songCards []models.SongCard
+	for _, elem := range songs{
+		artistName, err := uc.Repo.GetArtistNameBySongId(elem.Id)
+		if err != nil {
+			return models.Artist{}, err
+		}
+		albumName, err := uc.Repo.GetAlbumNameBySongId(elem.Id)
+		if err != nil {
+			return models.Artist{}, err
+		}
+		songCards = append(songCards, models.ConvertSongToCard(elem, artistName,
+			albumName))
+	}
+	a.Songs = songCards
+
+	return a, nil
+}
+
 
 /*
 func (uc *Usecase) GetSongsByFilmId(id int) ([]models.SongJSON, error){
@@ -40,28 +91,52 @@ func (uc *Usecase) GetSongsByFilmId(id int) ([]models.SongJSON, error){
 }
  */
 
-func (uc *Usecase) SearchFilm(name string) ([]models.FilmJSON, error) {
-	filmsSQL, err := uc.Repo.SearchFilm(name)
+func (uc *Usecase) SearchFilm(name string, page int) ([]models.FilmCard, error) {
+	filmsSQL, err := uc.Repo.SearchFilm(name, page)
 	if err != nil {
-		return []models.FilmJSON{}, err
+		return []models.FilmCard{}, err
 	}
 
-	var filmsJSON []models.FilmJSON
+	var filmCards []models.FilmCard
 	for _, elem := range filmsSQL {
-		filmsJSON = append(filmsJSON, models.ConvertFilm(elem))
+		filmCards = append(filmCards, models.ConvertFilmToCard(elem))
 	}
-	return filmsJSON, nil
+	return filmCards, nil
 }
 
-func (uc *Usecase) GetSimilarFilms(id int) ([]models.FilmJSON, error) {
-	filmsSQL, err := uc.Repo.GetSimilarFilms(id)
+func (uc *Usecase) GetSimilarFilms(id int, page int) ([]models.FilmCard, error) {
+	filmsSQL, err := uc.Repo.GetSimilarFilms(id, page)
 	if err != nil {
-		return []models.FilmJSON{}, err
+		return []models.FilmCard{}, err
 	}
 
-	var filmsJSON []models.FilmJSON
+	var filmCards []models.FilmCard
 	for _, elem := range filmsSQL {
-		filmsJSON = append(filmsJSON, models.ConvertFilm(elem))
+		filmCards = append(filmCards, models.ConvertFilmToCard(elem))
 	}
-	return filmsJSON, nil
+	return filmCards, nil
+}
+
+func (uc *Usecase) ShazamSong(name string) (models.SongShazam, error){
+	songs, err := uc.Repo.SearchSong(name, 1)
+	if err != nil {
+		return models.SongShazam{}, err
+	}
+	song := songs[0]
+
+	films, err :=  uc.Repo.GetFilmsBySongId(song.Id)
+	var filmCards []models.FilmCard
+	for _, elem := range films {
+		filmCards = append(filmCards, models.ConvertFilmToCard(elem))
+	}
+	artistName, err := uc.Repo.GetArtistNameBySongId(song.Id)
+	if err != nil {
+		return models.SongShazam{}, err
+	}
+	albumName, err := uc.Repo.GetAlbumNameBySongId(song.Id)
+	if err != nil {
+		return models.SongShazam{}, err
+	}
+
+	return models.ConvertSongToShazam(song, albumName, artistName, filmCards), nil
 }
