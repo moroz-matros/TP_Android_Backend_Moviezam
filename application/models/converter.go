@@ -2,8 +2,8 @@ package models
 
 import "time"
 
-func ConvertFilm(film FilmSQL) FilmJSON {
-	return FilmJSON{
+func ConvertFilm(film FilmSQL, artists []ArtistCard, songs []SongCard, similar []FilmCard) Film {
+	return Film{
 		Id:           film.Id,
 		Name:         film.Name,
 		NameStub:     film.NameStub,
@@ -11,25 +11,28 @@ func ConvertFilm(film FilmSQL) FilmJSON {
 		AirDateEnd:   time.Unix(film.AirDateEnd, 0).String(),
 		Image:        film.Image,
 		ReleaseDate:  film.ReleaseDate.String(),
+		Artists:      artists,
+		Songs:        songs,
+		Similar:      similar,
 	}
 
 }
 
 func ConvertFilmToCard(film FilmSQL) FilmCard {
 	return FilmCard{
-		Id:           film.Id,
-		Name:         film.Name,
-		Image:        film.Image,
-		ReleaseDate:  film.ReleaseDate.String(),
+		Id:          film.Id,
+		Name:        film.Name,
+		Image:       film.Image,
+		ReleaseDate: film.ReleaseDate.String(),
 	}
 
 }
 
 func ConvertSong(song SongSQL) SongJSON {
 	return SongJSON{
-		Id:           song.Id,
-		Name:         song.Name,
-		NameStub:     song.NameStub,
+		Id:             song.Id,
+		Name:           song.Name,
+		NameStub:       song.NameStub,
 		AlbumName:      song.AlbumName,
 		ExternalArtUrl: song.ExternalArtUrl.String,
 		Amazon:         song.Amazon.String,
@@ -42,10 +45,10 @@ func ConvertSong(song SongSQL) SongJSON {
 
 func ConvertSongToCard(song SongSQL, artist string, album string) SongCard {
 	return SongCard{
-		Id:     song.Id,
-		Name:   song.Name,
-		Artist: artist,
-		Album: album,
+		Id:             song.Id,
+		Name:           song.Name,
+		Artist:         artist,
+		Album:          album,
 		ExternalArtUrl: song.ExternalArtUrl.String,
 	}
 }
@@ -86,8 +89,8 @@ func ConvertArtist(artist ArtistSQL) Artist {
 
 func ConvertArtistToCard(artist ArtistSQL) ArtistCard {
 	return ArtistCard{
-		Id:            artist.Id,
-		Name:          artist.Name,
-		Image:         artist.Image,
+		Id:    artist.Id,
+		Name:  artist.Name,
+		Image: artist.Image,
 	}
 }

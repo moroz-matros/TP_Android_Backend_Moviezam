@@ -19,6 +19,9 @@ func CreateHandler(m *mux.Router, uc *usecase.Usecase) *Handler {
 	m.HandleFunc("/find_film", handler.SearchFilm)
 	// /find_film?search=Harry+Potter&page=1
 
+	m.HandleFunc("/film", handler.GetSongById)
+	// /film?id=1
+
 	m.HandleFunc("/similar_films", handler.GetSimilarFilms)
 	// /similar_films?film_id=1&page=1
 
@@ -30,21 +33,14 @@ func CreateHandler(m *mux.Router, uc *usecase.Usecase) *Handler {
 
 	m.HandleFunc("/artist", handler.GetArtistById)
 	// /artist?id=1
-	m.HandleFunc("/songs", handler.GetSongs)
-	// /songs?artist_id=1&film_id=1
 
 	m.HandleFunc("/moviezam", handler.ShazamSong)
-
+	// /moviezam?search=lala
 
 	return handler
 }
 
-
-func (h *Handler) GetFilmsBySongId(w http.ResponseWriter, r *http.Request){
-
-}
-
-func (h *Handler) GetSimilarFilms(w http.ResponseWriter, r *http.Request){
+func (h *Handler) GetSimilarFilms(w http.ResponseWriter, r *http.Request) {
 	filmId := r.URL.Query().Get("film_id")
 	id, err := strconv.Atoi(filmId)
 	if err != nil {
@@ -54,7 +50,9 @@ func (h *Handler) GetSimilarFilms(w http.ResponseWriter, r *http.Request){
 	}
 	page := r.URL.Query().Get("page")
 	var p int
-	if page == "" { p = 1 } else {
+	if page == "" {
+		p = 1
+	} else {
 		p, err = strconv.Atoi(page)
 		if err != nil || p < 0 {
 			log.Println(err)
@@ -77,59 +75,16 @@ func (h *Handler) GetSimilarFilms(w http.ResponseWriter, r *http.Request){
 	w.Write(body)
 }
 
-func (h *Handler) GetArtistBySongId(w http.ResponseWriter, r *http.Request){
-	_ = r.URL.Query().Get("song_id")
 
-}
 
-func (h *Handler) GetSongs(w http.ResponseWriter, r *http.Request){
-	artistId, err := strconv.Atoi(r.URL.Query().Get("artist_id"))
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if artistId != 0 {
-		songs, err := h.Uc.GetSongsByArtistId(artistId)
-		if err != nil {
-			w.WriteHeader(http.StatusForbidden)
-			return
-		}
-		body, _ := json.Marshal(songs)
-		w.WriteHeader(http.StatusOK)
-		w.Write(body)
-
-		return
-	}
-
-	//filmId, err := strconv.Atoi(r.URL.Query().Get("film_id"))
-	//if err != nil {
-	//	w.WriteHeader(http.StatusBadRequest)
-	//	return
-	//}
-
-	/*
-	if filmId != 0 {
-		songs, err := h.Uc.GetSongsByFilmId(artistId)
-		if err != nil {
-			w.WriteHeader(http.StatusForbidden)
-			return
-		}
-		body, _ := json.Marshal(songs)
-		w.WriteHeader(http.StatusOK)
-		w.Write(body)
-		return
-	}
-
-	 */
-}
-
-func (h *Handler) SearchFilm(w http.ResponseWriter, r *http.Request){
+func (h *Handler) SearchFilm(w http.ResponseWriter, r *http.Request) {
 	searchString := r.URL.Query().Get("search")
 	page := r.URL.Query().Get("page")
 	var p int
 	var err error
-	if page == "" { p = 1 } else {
+	if page == "" {
+		p = 1
+	} else {
 		p, err = strconv.Atoi(page)
 		if err != nil || p < 0 {
 			log.Println(err)
@@ -154,12 +109,14 @@ func (h *Handler) SearchFilm(w http.ResponseWriter, r *http.Request){
 	w.Write(body)
 }
 
-func (h *Handler) SearchSong(w http.ResponseWriter, r *http.Request){
+func (h *Handler) SearchSong(w http.ResponseWriter, r *http.Request) {
 	searchString := r.URL.Query().Get("search")
 	page := r.URL.Query().Get("page")
 	var p int
 	var err error
-	if page == "" { p = 1 } else {
+	if page == "" {
+		p = 1
+	} else {
 		p, err = strconv.Atoi(page)
 
 		if err != nil || p < 0 {
@@ -184,12 +141,14 @@ func (h *Handler) SearchSong(w http.ResponseWriter, r *http.Request){
 
 }
 
-func (h *Handler) SearchArtist(w http.ResponseWriter, r *http.Request){
+func (h *Handler) SearchArtist(w http.ResponseWriter, r *http.Request) {
 	searchString := r.URL.Query().Get("search")
 	page := r.URL.Query().Get("page")
 	var p int
 	var err error
-	if page == "" { p = 1 } else {
+	if page == "" {
+		p = 1
+	} else {
 		p, err = strconv.Atoi(page)
 
 		if err != nil || p < 0 {
@@ -214,8 +173,7 @@ func (h *Handler) SearchArtist(w http.ResponseWriter, r *http.Request){
 	w.Write(body)
 }
 
-
-func (h *Handler) GetSongsByFilm(w http.ResponseWriter, r *http.Request){
+func (h *Handler) GetSongsByFilm(w http.ResponseWriter, r *http.Request) {
 	_ = r.URL.Query().Get("film_id")
 
 }
@@ -223,7 +181,7 @@ func (h *Handler) GetSongsByFilm(w http.ResponseWriter, r *http.Request){
 func (h *Handler) ShazamSong(w http.ResponseWriter, r *http.Request) {
 	searchString := r.URL.Query().Get("search")
 	song, err := h.Uc.ShazamSong(searchString)
-	if err != nil{
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -251,6 +209,23 @@ func (h *Handler) GetArtistById(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(body)
-
 }
 
+func (h *Handler) GetSongById(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	film, err := h.Uc.GetFilmById(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	body, _ := json.Marshal(film)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(body)
+}

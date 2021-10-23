@@ -20,15 +20,11 @@ func CreateRepo(pool *pgxpool.Pool) *Repo {
 }
 
 
-func (r *Repo) GetSongByName(name string){
-
-}
-
 func (r *Repo) GetSongsByFilmId(id int) ([]models.SongSQL, error){
 	var songs []models.SongSQL
 	err := pgxscan.Select(context.Background(), r.Pool, &songs,
-		"SELECT * from sounds " +
-		"JOIN film_sound ON id_film = $1", id)
+		"SELECT * from sounds WHERE id IN " +
+		"(SELECT id_sound FROM film_sound WHERE id_film = $1)", id)
 
 	if errors.As(err, &sql.ErrNoRows) {
 		return []models.SongSQL{}, nil
@@ -81,7 +77,7 @@ func (r *Repo) GetSongsByArtistId(id int) ([]models.SongSQL, error){
 	var songs []models.SongSQL
 	err := pgxscan.Select(context.Background(), r.Pool, &songs,
 		"SELECT * FROM sounds WHERE id IN " +
-		"(SELECT id_sound FROM sound_artist WHERE id_artist = $1)", id)
+		"(SELECT DISTINCT id_sound FROM sound_artist WHERE id_artist = $1)", id)
 
 	if errors.As(err, &sql.ErrNoRows) {
 		return []models.SongSQL{}, nil
@@ -169,9 +165,9 @@ func (r *Repo) GetSimilarFilms(id int, page int) ([]models.FilmSQL, error) {
 
 func (r *Repo) GetFilmsBySongId(id int) ([]models.FilmSQL, error) {
 	var films []models.FilmSQL
-	/*
 	err := pgxscan.Select(context.Background(), r.Pool, &films,
-		"SELECT * FROM films
+		"SELECT * FROM films WHERE id IN (SELECT DISTINCT id_film from film_sound " +
+		"WHERE id_sound = $1)", id)
 	if errors.As(err, &sql.ErrNoRows) {
 		return []models.FilmSQL{}, nil
 	}
@@ -181,7 +177,6 @@ func (r *Repo) GetFilmsBySongId(id int) ([]models.FilmSQL, error) {
 		return []models.FilmSQL{}, err
 	}
 
-	 */
 
 	return films, nil
 }
@@ -201,4 +196,57 @@ func (r *Repo) GetArtistById(id int) (models.ArtistSQL, error) {
 	}
 
 	return artists[0], nil
+}
+
+func (r *Repo) GetFilmById(id int) (models.FilmSQL, error) {
+	var films []models.FilmSQL
+	err := pgxscan.Select(context.Background(), r.Pool, &films,
+		"SELECT * FROM films WHERE id = $1", id)
+	if errors.As(err, &sql.ErrNoRows) {
+		return models.FilmSQL{}, nil
+	}
+
+	if err != nil {
+		log.Println(err)
+		return models.FilmSQL{}, err
+	}
+
+
+	return films[0], nil
+}
+
+func (r *Repo) GetArtistBySongId(id int) (models.ArtistSQL, error) {
+	var artists []models.ArtistSQL
+	err := pgxscan.Select(context.Background(), r.Pool, &artists,
+		"SELECT * FROM artists WHERE id IN " +
+		"(SELECT DISTINCT id_artist FROM sound_artist WHERE id_sound = $1)", id)
+
+	if errors.As(err, &sql.ErrNoRows) {
+		return models.ArtistSQL{}, nil
+	}
+
+	if err != nil {
+		log.Println(err)
+		return models.ArtistSQL{}, err
+	}
+
+	return artists[0], nil
+}
+
+func (r *Repo) GetSimilarFilmsNoPage(id int) ([]models.FilmSQL, error) {
+	var films []models.FilmSQL
+	err := pgxscan.Select(context.Background(), r.Pool, &films,
+		"SELECT * FROM films WHERE id IN" +
+			"(SELECT DISTINCT (film_id) FROM similars WHERE similar_film_id = $1)", id)
+
+	if errors.As(err, &sql.ErrNoRows) {
+		return []models.FilmSQL{}, nil
+	}
+
+	if err != nil {
+		log.Println(err)
+		return []models.FilmSQL{}, err
+	}
+
+	return films, nil
 }

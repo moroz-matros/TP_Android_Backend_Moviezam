@@ -32,26 +32,26 @@ type SongSQL struct {
 }
 
 type Artist struct {
-	Id            int    `json:"id"`
-	Name          string `json:"name"`
-	NameStub      string `json:"name_stub"`
-	Image         string `json:"image"`
-	Biography     string `json:"biography"`
-	UrlOfficial   string `json:"url_official"`
-	UrlWikipedia  string `json:"url_wikipedia"`
-	UrlYoutube    string `json:"url_youtube"`
-	UrlSpotify    string `json:"url_spotify"`
-	UrlApplemusic string `json:"url_applemusic"`
-	UrlItunes     string `json:"url_itunes"`
-	UrlAmazon     string `json:"url_amazon"`
-	Songs []SongCard `json:"songs"`
+	Id            int        `json:"id"`
+	Name          string     `json:"name"`
+	NameStub      string     `json:"name_stub"`
+	Image         string     `json:"image"`
+	Biography     string     `json:"biography"`
+	UrlOfficial   string     `json:"url_official"`
+	UrlWikipedia  string     `json:"url_wikipedia"`
+	UrlYoutube    string     `json:"url_youtube"`
+	UrlSpotify    string     `json:"url_spotify"`
+	UrlApplemusic string     `json:"url_applemusic"`
+	UrlItunes     string     `json:"url_itunes"`
+	UrlAmazon     string     `json:"url_amazon"`
+	Songs         []SongCard `json:"songs"`
 }
 
 type ArtistSQL struct {
-	Id            int    `json:"id"`
-	Name          string `json:"name"`
-	NameStub      string `json:"name_stub"`
-	Image         string `json:"image"`
+	Id            int            `json:"id"`
+	Name          string         `json:"name"`
+	NameStub      string         `json:"name_stub"`
+	Image         string         `json:"image"`
 	Biography     sql.NullString `json:"biography"`
 	UrlOfficial   sql.NullString `json:"url_official"`
 	UrlWikipedia  sql.NullString `json:"url_wikipedia"`
@@ -63,10 +63,10 @@ type ArtistSQL struct {
 }
 
 type SongCard struct {
-	Id     int    `json:"id"`
-	Name   string `json:"name"`
-	Artist string `json:"artist"`
-	Album  string `json:"album"`
+	Id             int    `json:"id"`
+	Name           string `json:"name"`
+	Artist         string `json:"artist"`
+	Album          string `json:"album"`
 	ExternalArtUrl string `json:"external_art_url"`
 }
 
@@ -99,9 +99,9 @@ type FilmCard struct {
 }
 
 type ArtistCard struct {
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	Image       string `json:"image"`
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
 }
 
 type SongShazam struct {
@@ -117,4 +117,17 @@ type SongShazam struct {
 	Spotify        string     `json:"spotify"`
 	Youtube        string     `json:"youtube"`
 	Films          []FilmCard `json:"films"`
+}
+
+type Film struct {
+	Id           int          `json:"id"`
+	Name         string       `json:"name"`
+	NameStub     string       `json:"name_stub"`
+	AirDateStart string       `json:"air_date_start"`
+	AirDateEnd   string       `json:"air_date_end"`
+	Image        string       `json:"image"`
+	ReleaseDate  string       `json:"release_date"`
+	Artists      []ArtistCard `json:"artists"`
+	Songs        []SongCard   `json:"songs"`
+	Similar      []FilmCard   `json:"similars"`
 }
