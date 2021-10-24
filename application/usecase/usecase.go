@@ -185,3 +185,26 @@ func (uc *Usecase) GetFilmById(id int) (models.Film, error){
 
 	return f, nil
 }
+
+func (uc *Usecase) GetSongById(id int) (models.SongShazam, error){
+	song, err := uc.Repo.GetSongById(id)
+	if err != nil {
+		return models.SongShazam{}, err
+	}
+
+	films, err :=  uc.Repo.GetFilmsBySongId(song.Id)
+	var filmCards []models.FilmCard
+	for _, elem := range films {
+		filmCards = append(filmCards, models.ConvertFilmToCard(elem))
+	}
+	artistName, err := uc.Repo.GetArtistNameBySongId(song.Id)
+	if err != nil {
+		return models.SongShazam{}, err
+	}
+	albumName, err := uc.Repo.GetAlbumNameBySongId(song.Id)
+	if err != nil {
+		return models.SongShazam{}, err
+	}
+
+	return models.ConvertSongToShazam(song, artistName, albumName, filmCards), nil
+}

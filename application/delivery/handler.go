@@ -19,7 +19,7 @@ func CreateHandler(m *mux.Router, uc *usecase.Usecase) *Handler {
 	m.HandleFunc("/find_film", handler.SearchFilm)
 	// /find_film?search=Harry+Potter&page=1
 
-	m.HandleFunc("/film", handler.GetSongById)
+	m.HandleFunc("/film", handler.GetFilmById)
 	// /film?id=1
 
 	m.HandleFunc("/similar_films", handler.GetSimilarFilms)
@@ -27,6 +27,9 @@ func CreateHandler(m *mux.Router, uc *usecase.Usecase) *Handler {
 
 	m.HandleFunc("/find_song", handler.SearchSong)
 	// /songs?search=just+tonight&page=1
+
+	m.HandleFunc("/song", handler.GetSongById)
+	// /song?id=1
 
 	m.HandleFunc("/find_artist", handler.SearchArtist)
 	// /find_artist?search=sia
@@ -211,7 +214,7 @@ func (h *Handler) GetArtistById(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
-func (h *Handler) GetSongById(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetFilmById(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -225,6 +228,25 @@ func (h *Handler) GetSongById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body, _ := json.Marshal(film)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(body)
+}
+
+func (h *Handler) GetSongById(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	song, err := h.Uc.GetSongById(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	body, _ := json.Marshal(song)
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(body)

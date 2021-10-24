@@ -250,3 +250,20 @@ func (r *Repo) GetSimilarFilmsNoPage(id int) ([]models.FilmSQL, error) {
 
 	return films, nil
 }
+
+func (r *Repo) GetSongById(id int) (models.SongSQL, error){
+	var songs []models.SongSQL
+	err := pgxscan.Select(context.Background(), r.Pool, &songs,
+		"SELECT * FROM sounds WHERE id = $1", id)
+
+	if errors.As(err, &sql.ErrNoRows) {
+		return models.SongSQL{}, nil
+	}
+
+	if err != nil {
+		log.Println(err)
+		return models.SongSQL{}, err
+	}
+
+	return songs[0], nil
+}
