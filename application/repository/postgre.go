@@ -95,7 +95,7 @@ func (r *Repo) SearchArtist(name string, page int) ([]models.ArtistSQL, error) {
 	var artists []models.ArtistSQL
 	err := pgxscan.Select(context.Background(), r.Pool, &artists,
 		"SELECT * FROM artists WHERE LOWER(name) " +
-		"LIKE '%' || $1 || '%' LIMIT 10 OFFSET $2", strings.ToLower(name), (page-1)*10)
+		"LIKE '%' || $1 || '%' ORDER BY id LIMIT 20 OFFSET $2", strings.ToLower(name), (page-1)*10)
 
 	if errors.As(err, &sql.ErrNoRows) {
 		return []models.ArtistSQL{}, nil
@@ -113,7 +113,7 @@ func (r *Repo) SearchFilm(name string, page int) ([]models.FilmSQL, error) {
 	var films []models.FilmSQL
 	err := pgxscan.Select(context.Background(), r.Pool, &films,
 		"SELECT * FROM films WHERE LOWER(name) LIKE '%' || $1 || '%'" +
-		" LIMIT 10 OFFSET $2", strings.ToLower(name), (page-1)*10)
+		" ORDER BY id LIMIT 20 OFFSET $2", strings.ToLower(name), (page-1)*10)
 
 	if errors.As(err, &sql.ErrNoRows) {
 		return []models.FilmSQL{}, nil
@@ -131,7 +131,7 @@ func (r *Repo) SearchSong(name string, page int) ([]models.SongSQL, error) {
 	var songs []models.SongSQL
 	err := pgxscan.Select(context.Background(), r.Pool, &songs,
 		"SELECT * FROM sounds WHERE LOWER(name) LIKE '%' || $1 || '%' " +
-			" LIMIT 10 OFFSET $2", strings.ToLower(name), (page-1)*10)
+			" ORDER BY id LIMIT 20 OFFSET $2", strings.ToLower(name), (page-1)*10)
 	if errors.As(err, &sql.ErrNoRows) {
 		return []models.SongSQL{}, nil
 	}
@@ -149,7 +149,7 @@ func (r *Repo) GetSimilarFilms(id int, page int) ([]models.FilmSQL, error) {
 	err := pgxscan.Select(context.Background(), r.Pool, &films,
 		"SELECT * FROM films WHERE id IN" +
 		"(SELECT DISTINCT (film_id) FROM similars WHERE similar_film_id = $1)" +
-		" LIMIT 10 OFFSET $2", id, (page-1)*10)
+		" ORDER BY id LIMIT 20 OFFSET $2", id, (page-1)*10)
 
 	if errors.As(err, &sql.ErrNoRows) {
 		return []models.FilmSQL{}, nil
