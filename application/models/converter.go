@@ -43,13 +43,14 @@ func ConvertSong(song SongSQL) SongJSON {
 	}
 }
 
-func ConvertSongToCard(song SongSQL, artist string, album string) SongCard {
+func ConvertSongToCard(song SongSQL, artist string, album string, description string) SongCard {
 	return SongCard{
 		Id:             song.Id,
 		Name:           song.Name,
 		Artist:         artist,
 		Album:          album,
 		ExternalArtUrl: song.ExternalArtUrl.String,
+		Description:    description,
 	}
 }
 

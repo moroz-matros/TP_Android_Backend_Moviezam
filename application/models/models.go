@@ -31,6 +31,12 @@ type SongSQL struct {
 	Youtube        sql.NullString `json:"youtube"`
 }
 
+type SongShort struct {
+	IdSound     int            `sql:"id_sound"`
+	IdFilm      int            `sql:"id_film"`
+	Description sql.NullString `sql:"description"`
+}
+
 type Artist struct {
 	Id            int        `json:"id"`
 	Name          string     `json:"name"`
@@ -68,6 +74,7 @@ type SongCard struct {
 	Artist         string `json:"artist"`
 	Album          string `json:"album"`
 	ExternalArtUrl string `json:"external_art_url"`
+	Description    string `json:"description"`
 }
 
 type FilmSQL struct {

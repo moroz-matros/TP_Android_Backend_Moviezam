@@ -78,8 +78,6 @@ func (h *Handler) GetSimilarFilms(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
-
-
 func (h *Handler) SearchFilm(w http.ResponseWriter, r *http.Request) {
 	searchString := r.URL.Query().Get("search")
 	page := r.URL.Query().Get("page")
