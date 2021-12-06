@@ -72,7 +72,7 @@ type SongCard struct {
 	Id             int    `json:"id"`
 	Name           string `json:"name"`
 	Artist         string `json:"artist"`
-	Album          string `json:"album"`
+	Album          string `json:"album_name"`
 	ExternalArtUrl string `json:"external_art_url"`
 	Description    string `json:"description"`
 }
